@@ -1,0 +1,292 @@
+/* Home.css */
+
+/* ===== RESET & BASE ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.home {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== HEADER ===== */
+.header {
+  background: #fdbe02;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 61px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: none;
+  justify-content: space-between;
+  padding: 0 18px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  font-size: 34px;
+  font-weight: 900;
+  color: #000000;
+  white-space: nowrap;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 0 12px;
+  height: 25px;
+  gap: 8px;
+}
+
+.search-input {
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #767676;
+  width: 349px;
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+}
+
+.search-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 20px;
+}
+
+/* ===== BUTTON CONTRASTE ===== */
+.btn-contraste {
+  background: #141414;
+  color: #f5f5f5;
+  border: none;
+  border-radius: 10px;
+  padding: 6px 20px;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.btn-contraste:hover {
+  opacity: 0.85;
+}
+
+/* ===== MENÚ ===== */
+.menu {
+  background: #fdbe02;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 8px 10px;
+  height: 38px;
+}
+
+.menu-item {
+  font-size: 16px;
+  color: #141414;
+  text-decoration: none;
+  line-height: 1.4;
+}
+
+.menu-item:hover {
+  text-decoration: underline;
+}
+
+/* ===== CATEGORÍAS ===== */
+.categories-bar {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px;
+  padding: 10px;
+  overflow-x: auto;
+  height: 72px;
+}
+
+.category-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  min-width: 40px;
+}
+
+.category-icon {
+  width: 40px;
+  height: 40px;
+  background: #fdbe02;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.category-label {
+  font-size: 10px;
+  color: #141414;
+  text-align: center;
+  white-space: pre-line;
+  line-height: 1.2;
+  margin-top: 0;
+}
+
+/* ===== SELECTOR DE FECHA ===== */
+.date-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 10px;
+  height: 56px;
+  background: #ffffff;
+}
+
+.date-label {
+  font-size: 16px;
+  color: #000000;
+  font-weight: 400;
+}
+
+.date-controls {
+  display: flex;
+  gap: 20px;
+}
+
+.date-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fdbe02;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  color: #141414;
+  cursor: pointer;
+  min-width: 139px;
+  justify-content: space-between;
+}
+
+.date-btn:hover {
+  filter: brightness(0.95);
+}
+
+/* ===== HERO IMAGE ===== */
+.hero-image {
+  width: 100%;
+  height: 600px;
+  overflow: hidden;
+}
+
+.hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ===== SECCIONES DE FILTRO ===== */
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.section-title-bar {
+  background: #fdbe02;
+  padding: 0 100px;
+  display: inline-flex;
+  align-self: flex-start;
+  height: 29px;
+  align-items: center;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #000000;
+}
+
+.carousel {
+  display: flex;
+  gap: 18px;
+  padding: 10px 16px;
+  background: #dfdfdf;
+  overflow-x: auto;
+  
+}
+
+.carousel-card {
+  flex: 0 0 auto;
+  width: min(320px, 75vw);
+  height: auto;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.carousel-card img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  display: block;
+  border-radius: 12px;
+}
+
+/* ===== CTA SECTION ===== */
+.cta-section {
+  background: #fdbe02;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 335px 0;
+  gap: 10px;
+  text-align: center;
+}
+
+.cta-title {
+  font-size: 34px;
+  font-weight: 900;
+  color: #000000;
+}
+
+.cta-description {
+  max-width: 800px;
+  font-size: 18px;
+  color: #000000;
+  line-height: 1.5;
+  padding: 31px 100px;
+}
