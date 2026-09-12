@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import '../../pages/bookings/Home.css';
+import { useNavigation } from '../../hooks/useNavigation';
 
 // ============ DATOS ============
 const categories = [
@@ -49,6 +50,7 @@ export function SearchBar() {
 }
 
 export function Header() {
+  const { navigateTo } = useNavigation();
   return (
     <header className="header">
       <div className="header-content">
@@ -57,8 +59,8 @@ export function Header() {
           <SearchBar />
         </div>
         <div className="header-actions">
-          <ButtonContraste>Inicio de Sesión.</ButtonContraste>
-          <ButtonContraste>Registro.</ButtonContraste>
+          <ButtonContraste onClick={() => navigateTo('/login')}>Inicio de Sesión.</ButtonContraste>
+          <ButtonContraste onClick={() => navigateTo('/register')}>Registro.</ButtonContraste>
         </div>
       </div>
     </header>
@@ -98,22 +100,78 @@ export function CategoriesBar() {
 }
 
 export function DateSelector() {
+  const [arrival, setArrival] = useState('');
+  const [departure, setDeparture] = useState('');
+
+  const arrivalInputRef = useRef(null);
+  const departureInputRef = useRef(null);
+
+  const openCalendar = (ref) => {
+    if (ref.current) {
+      if (typeof ref.current.showPicker === 'function') {
+        ref.current.showPicker();
+      } else {
+        ref.current.click();
+      }
+    }
+  };
+
   return (
     <div className="date-selector">
       <span className="date-label">Cuándo llegas y cuándo te despedimos</span>
+
       <div className="date-controls">
-        <button className="date-btn">
-          Llegada
+        <button
+          type="button"
+          className="date-btn"
+          onClick={() => openCalendar(arrivalInputRef)}
+        >
+          <span>{arrival ? arrival : 'Llegada'}</span>
           <ChevronDown />
+          <input
+            ref={arrivalInputRef}
+            type="date"
+            value={arrival}
+            onChange={(e) => setArrival(e.target.value)}
+            aria-label="Fecha de llegada"
+            style={{
+              position: 'absolute',
+              opacity: 0,
+              width: 1,
+              height: 1,
+              pointerEvents: 'none',
+            }}
+          />
         </button>
-        <button className="date-btn">
-          Salida
+
+        <button
+          type="button"
+          className="date-btn"
+          onClick={() => openCalendar(departureInputRef)}
+        >
+          <span>{departure ? departure : 'Salida'}</span>
           <ChevronDown />
+          <input
+            ref={departureInputRef}
+            type="date"
+            value={departure}
+            onChange={(e) => setDeparture(e.target.value)}
+            aria-label="Fecha de salida"
+            style={{
+              position: 'absolute',
+              opacity: 0,
+              width: 1,
+              height: 1,
+              pointerEvents: 'none',
+            }}
+          />
         </button>
       </div>
     </div>
   );
 }
+
+
 
 export function ChevronDown() {
   return (
@@ -176,5 +234,50 @@ export function CTASection() {
       </p>
       <ButtonContraste>Quiero ser parte.</ButtonContraste>
     </section>
+  );
+}
+
+
+export function NumberSelector() {
+  const [guest, setGuest] = useState(2);
+  const min = 1;
+  const max = 10;
+
+  const aumentar = () => {
+    if (guest < max) {
+      setGuest((prev) => prev + 1);
+    }
+  }
+
+  const disminuir = () => {
+    if (guest > min) {
+      setGuest((prev) => prev - 1);
+    }
+  }
+
+  return (
+    <div className="date-selector">
+      <span className="date-label">Huéspedes</span>
+
+      <div className="date-controls">
+        <button
+          type="button"
+          className="date-btn"
+          onClick={disminuir}
+        >
+          <span>-</span>
+        </button>
+
+        <span className="date-value">{guest}</span>
+
+        <button
+          type="button"
+          className="date-btn"
+          onClick={aumentar}
+        >
+          <span>+</span>
+        </button>
+      </div>
+    </div>
   );
 }

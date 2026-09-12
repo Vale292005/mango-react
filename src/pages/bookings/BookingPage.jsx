@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useBookings } from '../../hooks/useBookings'
-import { Header, Menu, CategoriesBar, DateSelector, HeroImage, FilterSection, CTASection } from '../../components/bookings/components.jsx'
+import { Header, Menu, CategoriesBar, DateSelector, HeroImage, FilterSection, CTASection, NumberSelector } from '../../components/bookings/components.jsx'
 
 const sections = [
   {
@@ -60,7 +60,10 @@ export default function BookingPage() {
       <Header />
       <Menu />
       <CategoriesBar />
-      <DateSelector />
+      <div className="date-selectors">
+        <DateSelector />
+        <NumberSelector />
+      </div>
       <HeroImage />
       {sections.map((section) => (
         <FilterSection
