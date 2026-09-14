@@ -262,17 +262,17 @@ export function NumberSelector() {
       <div className="date-controls">
         <button
           type="button"
-          className="date-btn"
+          className="number-btn"
           onClick={disminuir}
         >
           <span>-</span>
         </button>
 
-        <span className="date-value">{guest}</span>
+        <span className="date-label">{guest}</span>
 
         <button
           type="button"
-          className="date-btn"
+          className="number-btn"
           onClick={aumentar}
         >
           <span>+</span>

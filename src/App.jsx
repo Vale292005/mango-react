@@ -1,12 +1,13 @@
 import BookingPage from './pages/bookings/BookingPage'
+import LoginPage from './pages/auth/LoginPage'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 
 function HomePage() {
   return <BookingPage />
 }
 
-function LoginPage() {
-  return <h1>Login Page</h1>
+function Auth() {
+  return <LoginPage />
 }
 
 function RegisterPage() {

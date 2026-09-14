@@ -296,12 +296,19 @@
   flex-direction: row;
 }
 
+@media screen and (max-width: 768px) {
+  .date-selectors {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
 .number-selector {
   display: flex;
   flex-direction: row;
 }
 
-.btn-number {
+.number-btn {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -313,6 +320,6 @@
   font-family: 'Inter', sans-serif;
   color: #141414;
   cursor: pointer;
-  min-width: 139px;
+  min-width: 35px;
   justify-content: space-between;
 }
