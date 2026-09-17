@@ -43,10 +43,8 @@
 }
 
 .logo {
-  font-size: 34px;
-  font-weight: 900;
-  color: #000000;
-  white-space: nowrap;
+  width: 148px;
+  height: auto;
 }
 
 .search-bar {

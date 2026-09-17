@@ -1,0 +1,64 @@
+/* Contenedor principal de la Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100vh;
+  background-color: #ffc400; /* Amarillo característico */
+  color: #000000;
+  padding: 32px 24px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Separa la sección superior de la inferior */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  z-index: 1000;
+}
+
+/* Sección Superior */
+.sideBarUp {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Título / Logo (Mangoa.) */
+.sideBarUp .logo {
+  font-size: 2.2rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+/* Opciones superiores */
+.sideBarUp span {
+  font-size: 1.1rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.sideBarUp span:hover {
+  opacity: 0.7;
+}
+
+/* Sección Inferior */
+.sideBarDown {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sideBarDown span {
+  font-size: 1.1rem;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+/* Opción destacada en negrita al final */
+.sideBarDown .highlight {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-top: 4px;
+}

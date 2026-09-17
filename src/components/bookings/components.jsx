@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { Sidebar } from '../layout/sideBar';
 import '../../pages/bookings/Home.css';
 import { useNavigation } from '../../hooks/useNavigation';
 
@@ -51,11 +52,13 @@ export function SearchBar() {
 
 export function Header() {
   const { navigateTo } = useNavigation();
+  const [isSidebarOpen, setSidebarOpen] = useState(false)
   return (
+    <>
     <header className="header">
       <div className="header-content">
         <div className="header-left">
-          <h1 className="logo">Mangoa.</h1>
+          <img className='logo' src='src/assets/logo.png' onClick={() => setSidebarOpen(true)} alt="Logo" />
           <SearchBar />
         </div>
         <div className="header-actions">
@@ -64,6 +67,8 @@ export function Header() {
         </div>
       </div>
     </header>
+  <Sidebar isSideBarOpen={isSidebarOpen} setSideBarOpen={setSidebarOpen} />
+    </>
   );
 }
 
