@@ -1,7 +1,8 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { Sidebar } from '../layout/sideBar';
 import '../../pages/bookings/Home.css';
 import { useNavigation } from '../../hooks/useNavigation';
+import { useBookings } from '../../hooks/useBookings';
 
 // ============ DATOS ============
 const categories = [
@@ -32,13 +33,92 @@ export function ButtonContraste({ children, onClick }) {
   );
 }
 
+
 export function SearchBar() {
+  const { bookings = [], getBookings } = useBookings();
+  const [localBookings, setLocalBookings] = useState([]);
+  const [query, setQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [showList, setShowList] = useState(false);
+
+  // 1. Cargar las reservas al montar el componente (intentando traer un tamaño amplio si lo soporta tu API)
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      if (!getBookings) return;
+      try {
+        // Si tu API acepta parámetros de paginación, pide un tamaño grande para poder filtrar en cliente:
+        const data = await getBookings({ page: 0, size: 1000 });
+        if (mounted && data) {
+          setLocalBookings(data);
+        }
+      } catch (err) {
+        console.error("Error al cargar bookings:", err);
+      }
+    };
+    load();
+    return () => { mounted = false; };
+  }, []);
+
+  // 2. Filtrado local inteligente
+  useEffect(() => {
+    if (query.length < 1) {
+      setSuggestions([]);
+      setShowList(false);
+      return;
+    }
+
+    const q = query.trim().toLowerCase();
+    const id = setTimeout(() => {
+      let rawSource = localBookings.length > 0 ? localBookings : (bookings || []);
+      
+      // Extraemos el array del objeto paginado de Spring Boot (.content) o usamos rawSource si ya es un array
+      const source = Array.isArray(rawSource) 
+        ? rawSource 
+        : (rawSource.content || rawSource.data || []);
+
+      if (!Array.isArray(source) || source.length === 0) {
+        setSuggestions([]);
+        return;
+      }
+
+      const results = source.filter((b) => {
+        if (!b) return false;
+
+        // Adaptado tanto para Objetos JSON como para Arrays/Tuplas por si cambias el backend
+        const accommodationName = String(b.accommodationName || b[4] || '').toLowerCase();
+        const userName = String(b.userName || b[2] || '').toLowerCase();
+        const status = String(b.status || b[8] || '').toLowerCase();
+
+        return (
+          accommodationName.includes(q) ||
+          userName.includes(q) ||
+          status.includes(q)
+        );
+      }).slice(0, 6);
+
+      setSuggestions(results);
+      setShowList(true);
+    }, 300);
+
+    return () => clearTimeout(id);
+  }, [query, localBookings, bookings]);
+
+  const handleSelect = (item) => {
+    setQuery(item.accommodationName || item[4] || '');
+    setShowList(false);
+  };
+
   return (
-    <div className="search-bar">
+    <div className="search-bar" style={{ position: 'relative' }}>
       <input
         type="text"
-        placeholder="¿Buscas un rincón acogedor?"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        onFocus={() => { if (suggestions.length) setShowList(true); }}
+        placeholder="Busca por alojamiento, usuario o estado..."
         className="search-input"
+        aria-label="Buscar reservas"
       />
       <button className="search-icon" aria-label="Buscar">
         <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
@@ -46,6 +126,16 @@ export function SearchBar() {
           <line x1="11.5" y1="11.5" x2="16" y2="16" stroke="#141414" strokeWidth="2" strokeLinecap="round" />
         </svg>
       </button>
+
+      {showList && suggestions.length > 0 && (
+        <ul className="search-suggestions" style={{ position: 'absolute', top: '110%', left: 0, right: 0, background: '#fff', zIndex: 1500, listStyle: 'none', margin: 0, padding: '8px 0', boxShadow: '0 6px 18px rgba(0,0,0,0.12)', borderRadius: 6 }}>
+          {suggestions.map((s, i) => (
+            <li key={i} onMouseDown={() => handleSelect(s)} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #f0f0f0' }}>
+              <div style={{ fontWeight: '500' }}>{s.accommodationName || s[4]}</div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -55,19 +145,19 @@ export function Header() {
   const [isSidebarOpen, setSidebarOpen] = useState(false)
   return (
     <>
-    <header className="header">
-      <div className="header-content">
-        <div className="header-left">
-          <img className='logo' src='src/assets/logo.png' onClick={() => setSidebarOpen(true)} alt="Logo" />
-          <SearchBar />
+      <header className="header">
+        <div className="header-content">
+          <div className="header-left">
+            <img className='logo' src='src/assets/logo.png' onClick={() => setSidebarOpen(true)} alt="Logo" />
+            <SearchBar />
+          </div>
+          <div className="header-actions">
+            <ButtonContraste onClick={() => navigateTo('/login')}>Inicio de Sesión.</ButtonContraste>
+            <ButtonContraste onClick={() => navigateTo('/register')}>Registro.</ButtonContraste>
+          </div>
         </div>
-        <div className="header-actions">
-          <ButtonContraste onClick={() => navigateTo('/login')}>Inicio de Sesión.</ButtonContraste>
-          <ButtonContraste onClick={() => navigateTo('/register')}>Registro.</ButtonContraste>
-        </div>
-      </div>
-    </header>
-  <Sidebar isSideBarOpen={isSidebarOpen} setSideBarOpen={setSidebarOpen} />
+      </header>
+      <Sidebar isSideBarOpen={isSidebarOpen} setSideBarOpen={setSidebarOpen} />
     </>
   );
 }

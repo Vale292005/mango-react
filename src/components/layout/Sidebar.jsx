@@ -4,11 +4,14 @@ import logo from "../../assets/logo.png";
 import "./SideBar.css";
 
 export function Sidebar({ isSideBarOpen, setSideBarOpen }) {
+
+    //Animacion del componente
     const asideSpring = useSpring({
         transform: isSideBarOpen ? 'translateX(0%)' : 'translateX(-100%)',
         config: { tension: 250, friction: 30 },
     });
 
+    //Animacion del fondo
     const backdropSpring = useSpring({
         opacity: isSideBarOpen ? 1 : 0,
         config: { tension: 200, friction: 25 },
@@ -51,8 +54,6 @@ export function Sidebar({ isSideBarOpen, setSideBarOpen }) {
                 </div>
 
                 <div className="sideBarDown">
-                    <span>Usuarios</span>
-                    <span>Alojamientos</span>
                     <span className="highlight">Cuéntanos qué necesitas</span>
                 </div>
             </animated.aside>
