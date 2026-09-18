@@ -13,11 +13,6 @@
     padding: 30px 24px;
     box-sizing: border-box;
 
-    border-top: 20px solid #FDBE02;
-    border-bottom: 20px solid #FDBE02;
-    border-left: none;
-    border-right: none;
-
     backdrop-filter: blur(10px) saturate(180%);
     -webkit-backdrop-filter: blur(10px) saturate(180%);
 }
