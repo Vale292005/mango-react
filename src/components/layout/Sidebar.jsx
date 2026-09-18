@@ -1,7 +1,7 @@
 import React from "react";
 import { useSpring, animated } from '@react-spring/web';
 import logo from "../../assets/logo.png";
-import "./SideBar.css";
+import "./Sidebar.css";
 
 export function Sidebar({ isSideBarOpen, setSideBarOpen }) {
 
@@ -44,7 +44,6 @@ export function Sidebar({ isSideBarOpen, setSideBarOpen }) {
                     height: '100vh',
                     zIndex: 1000,
                 }}
-                className={`sidebar ${isSideBarOpen ? 'open' : ''}`}
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="sideBarUp">
