@@ -1,11 +1,13 @@
 import { useAuth } from "../../hooks/useAuth"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useSpring, animated } from '@react-spring/web';
 import { useNavigation } from '../../hooks/useNavigation';
+import { useLocation } from "react-router-dom";
 import "./Auth.css"
 
 export function Auth({ isLogin, setIsLogin }) {
     const { navigateTo } = useNavigation();
+    const location = useLocation();
     const { loginUser, logout, newUser, user, loading, error } = useAuth()
     const [formData, setFormData] = useState({
         email: '',
@@ -18,6 +20,14 @@ export function Auth({ isLogin, setIsLogin }) {
         const { name, value } = e.target
         setFormData((prev) => ({ ...prev, [name]: value }))
     }
+
+    useEffect(() => {
+        if (window.location.pathname === '/login') {
+            setIsLogin(true);
+        } else if (window.location.pathname === '/register') {
+            setIsLogin(false);
+        }
+    }, [isLogin, location.pathname]);
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -118,7 +128,7 @@ export function Auth({ isLogin, setIsLogin }) {
                         <p>
                             {isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?'}
                         </p>
-                        <button type="button" onClick={() => setIsLogin(!isLogin)} className="auth-button">
+                        <button type="button" onClick={() => navigateTo('/login')} className="auth-button">
                             {isLogin ? 'Crear una' : 'Iniciar sesión'}
                         </button>
                     </div>
@@ -176,7 +186,7 @@ export function Auth({ isLogin, setIsLogin }) {
                         <p>
                             {isLogin ? '¿No tienes cuenta? ' : '¿Ya tienes cuenta? '}
                         </p>
-                        <button type="button" onClick={() => setIsLogin(!isLogin)} className="auth-button">
+                        <button type="button" onClick={() => navigateTo('/register')} className="auth-button">
                             {isLogin ? 'Crear una' : 'Iniciar sesión'}
                         </button>
                     </div>
