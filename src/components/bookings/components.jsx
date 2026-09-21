@@ -71,10 +71,10 @@ export function SearchBar() {
     const q = query.trim().toLowerCase();
     const id = setTimeout(() => {
       let rawSource = localBookings.length > 0 ? localBookings : (bookings || []);
-      
+
       // Extraemos el array del objeto paginado de Spring Boot (.content) o usamos rawSource si ya es un array
-      const source = Array.isArray(rawSource) 
-        ? rawSource 
+      const source = Array.isArray(rawSource)
+        ? rawSource
         : (rawSource.content || rawSource.data || []);
 
       if (!Array.isArray(source) || source.length === 0) {
@@ -142,6 +142,8 @@ export function SearchBar() {
 
 export function Header() {
   const { navigateTo } = useNavigation();
+  const estaLogueado = localStorage.getItem('token') !== null;
+  console.log(localStorage.getItem('item'))
   const [isSidebarOpen, setSidebarOpen] = useState(false)
   return (
     <>
@@ -152,8 +154,12 @@ export function Header() {
             <SearchBar />
           </div>
           <div className="header-actions">
-            <ButtonContraste onClick={() => navigateTo('/login')}>Inicio de Sesión.</ButtonContraste>
-            <ButtonContraste onClick={() => navigateTo('/register')}>Registro.</ButtonContraste>
+            {estaLogueado !== null && (
+              <>
+                <ButtonContraste onClick={() => navigateTo('/login')}>Inicio de Sesión.</ButtonContraste>
+                <ButtonContraste onClick={() => navigateTo('/register')}>Registro.</ButtonContraste>
+              </>
+            )}
           </div>
         </div>
       </header>

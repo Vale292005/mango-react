@@ -1,9 +1,11 @@
 import { useAuth } from "../../hooks/useAuth"
 import { useState } from "react"
 import { useSpring, animated } from '@react-spring/web';
+import { useNavigation } from '../../hooks/useNavigation';
 import "./Auth.css"
 
 export function Auth({ isLogin, setIsLogin }) {
+    const { navigateTo } = useNavigation();
     const { loginUser, logout, newUser, user, loading, error } = useAuth()
     const [formData, setFormData] = useState({
         email: '',
@@ -23,10 +25,13 @@ export function Auth({ isLogin, setIsLogin }) {
         if (isLogin) {
             const { email, password } = formData
             await loginUser(formData)
+            navigateTo('/booking')
         }
 
-        const { email, password, firstName, lastName } = formData
-        await newUser(formData)
+        else {
+            const { email, password, firstName, lastName } = formData
+            await newUser(formData)
+        }
     }
 
     const asideSpringLogin = useSpring({
@@ -75,7 +80,7 @@ export function Auth({ isLogin, setIsLogin }) {
                             <input
                                 className="auth-input"
                                 type="text"
-                                name="email"
+                                name="lastName"
                                 value={formData.lastName}
                                 onChange={handleChange}
                                 placeholder="Perez"
@@ -103,19 +108,19 @@ export function Auth({ isLogin, setIsLogin }) {
                                 placeholder="••••••••"
                             />
                         </label>
-                        <button className="auth-button" disabled={loading}>
+                        <button className="auth-button" disabled={loading} onClick={handleSubmit}>
                             {loading ? 'Cargando...' : isLogin ? 'Iniciar sesión' : 'Registrarme'}
                         </button>
                     </div>
                     {error && <p className="auth-error">Hubo un error</p>}
 
                     <div className="auth-card-buttons">
-                                            <p>
-                        {isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?'}
-                    </p>
-                    <button type="button" onClick={() => setIsLogin(!isLogin)} className="auth-button">
-                        {isLogin ? 'Crear una' : 'Iniciar sesión'}
-                    </button>
+                        <p>
+                            {isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?'}
+                        </p>
+                        <button type="button" onClick={() => setIsLogin(!isLogin)} className="auth-button">
+                            {isLogin ? 'Crear una' : 'Iniciar sesión'}
+                        </button>
                     </div>
 
                 </div>
@@ -161,24 +166,24 @@ export function Auth({ isLogin, setIsLogin }) {
                                 placeholder="••••••••"
                             />
                         </label>
-                        <button className="auth-button" disabled={loading}>
+                        <button className="auth-button" disabled={loading} onClick={handleSubmit}>
                             {loading ? 'Cargando...' : isLogin ? 'Iniciar sesión' : 'Registrarme'}
                         </button>
                     </div>
                     {error && <p className="auth-error">Hubo un error</p>}
 
                     <div className="auth-card-buttons">
-                    <p>
-                        {isLogin ? '¿No tienes cuenta? ' : '¿Ya tienes cuenta? '}
-                    </p>
-                    <button type="button" onClick={() => setIsLogin(!isLogin)} className="auth-button">
-                        {isLogin ? 'Crear una' : 'Iniciar sesión'}
-                    </button>
+                        <p>
+                            {isLogin ? '¿No tienes cuenta? ' : '¿Ya tienes cuenta? '}
+                        </p>
+                        <button type="button" onClick={() => setIsLogin(!isLogin)} className="auth-button">
+                            {isLogin ? 'Crear una' : 'Iniciar sesión'}
+                        </button>
+                    </div>
+
                 </div>
 
-            </div>
-
-        </animated.aside >
+            </animated.aside >
         </>
     )
 }

@@ -22,6 +22,7 @@ export const register = async ({ email, password, firstName, lastName }) => {
             firstName,
             lastName
         }, { withCredentials: true })
+        console.log(response)
         return response.data
     } catch (error) {
         console.error('Error registering:', error)
