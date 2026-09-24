@@ -36,6 +36,7 @@ export function Sidebar({ isSideBarOpen, setSideBarOpen }) {
             />
 
             <animated.aside
+                className="sidebar"
                 style={{
                     ...asideSpring,
                     position: 'fixed',

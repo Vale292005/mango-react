@@ -1,65 +1,103 @@
-import { useState } from 'react'
-import { useBookings } from '../../hooks/useBookings'
-import { Header, Menu, CategoriesBar, DateSelector, HeroImage, FilterSection, CTASection, NumberSelector } from '../../components/bookings/components.jsx'
-
-const sections = [
-  {
-    title: 'Más Populares:',
-    images: [
-      'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=900&q=80',
-    ],
-  },
-  {
-    title: 'Chalets con encanto:',
-    images: [
-      'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1501183638710-841dd1904471?auto=format&fit=crop&w=900&q=80',
-    ],
-  },
-  {
-    title: 'Estilo tradicional:',
-    images: [
-      'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=900&q=80',
-    ],
-  },
-]
+import { useEffect, useState } from 'react'
+import { useAccommodations } from '../../hooks/useAccommodations.js';
+import { Header, Menu, ExplorePage, DateSelector, HeroImage, FilterSection, CTASection, NumberSelector } from '../../components/bookings/components.jsx'
+import imagenDefault from '../../assets/url_por_defecto.png'
 
 export default function BookingPage() {
+  // 1. Usamos tu hook corregido de alojamientos
+  const { accommodations = [], loading, error, getAccommodations, newAccommodation } = useAccommodations();
 
-  const { bookings, loading, error, saveBooking } = useBookings(1)
+  const [localAccommodations, setLocalAccommodations] = useState([]);
+
+  // Formulario de ejemplo (adaptado a hospedajes / reservas)
   const [form, setForm] = useState({
-    hotelId: 1,
-    checkIn: '',
-    checkOut: '',
-    guest: 2,
-  })
+    location: '',
+    capacity: 2,
+    maxPrice: ''
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    try {
-      await saveBooking(form)
-      alert('Booking created successfully!')
-    } catch (error) {
-      alert('Error creating booking: ' + error.message)
+  // 2. Cargamos los alojamientos al montar el componente
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      if (!getAccommodations)return;
+      try {
+        // Llamamos a la función del hook sin parámetros para traer todos inicialmente
+        const data = await getAccommodations();
+        if (mounted && data) {
+          setLocalAccommodations(Array.isArray(data) ? data : (data.content || []));
+        }
+      } catch (err) {
+        console.error("Error al cargar los alojamientos:", err);
+      }
+    };
+    load();
+    return () => { mounted = false; };
+  }, []);
+
+  // 3. Filtrar los alojamientos que tienen piscina (Corregido .toUperCase() -> .toUpperCase())
+  const alojamientosConPiscina = localAccommodations.filter((item) => {
+    if (!item.caracteristicas) return false;
+    return item.caracteristicas.some(amenity => amenity.toUpperCase() === "PISCINA");
+  });
+  const alojamientosPetFriendly = localAccommodations.filter((item) => {
+    if (!item.caracteristicas) return false;
+    return item.caracteristicas.some(amenity => amenity.toUpperCase() === "PET_FRIENDLY");
+  });
+  const alojamientosConParking = localAccommodations.filter((item) => {
+    if (!item.caracteristicas) return false;
+    return item.caracteristicas.some(amenity => amenity.toUpperCase() === "PARQUEADERO");
+  });
+
+  const sections = [
+    {
+      title: "Alojamientos con Piscina",
+      images: alojamientosConPiscina.map(item => ({
+        url: item.rutasImagenes?.[0] || imagenDefault,
+        title: item.name,
+        location: item.location,
+        id: item.id
+      }))
+    },
+    {
+      title: "Pet Friendly",
+      images: alojamientosPetFriendly.map(item => ({
+        url: item.rutasImagenes?.[0] || imagenDefault,
+        title: item.name,
+        location: item.location,
+        id: item.id
+      }))
+    },
+    {
+      title: "Con Parqueadero",
+      images: alojamientosConParking.map(item => ({
+        url: item.rutasImagenes?.[0] || imagenDefault,
+        title: item.name,
+        location: item.location,
+        id: item.id
+      }))
     }
-  }
+  ]
+
+  // 4. Manejar envío o búsqueda
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      // Ejemplo: buscar aplicando los filtros del formulario
+      const data = await getAccommodations(form.location, form.maxPrice, form.capacity);
+      if (data) {
+        setLocalAccommodations(Array.isArray(data) ? data : (data.content || []));
+      }
+    } catch (err) {
+      alert('Error al buscar hospedajes: ' + err.message);
+    }
+  };
 
   return (
     <div className="home">
       <Header />
       <Menu />
-      <CategoriesBar />
+      <ExplorePage />
       <div className="date-selectors">
         <DateSelector />
         <NumberSelector />

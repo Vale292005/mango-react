@@ -3,24 +3,25 @@ import { Sidebar } from '../layout/sideBar';
 import '../../pages/bookings/Home.css';
 import { useNavigation } from '../../hooks/useNavigation';
 import { useBookings } from '../../hooks/useBookings';
+import { useAccommodations } from '../../hooks/useAccommodations';
 
 // ============ DATOS ============
 const categories = [
-  { icon: '🐾', label: 'Pet\nFriendly' },
-  { icon: '♿', label: 'Accesibilidad' },
-  { icon: '💆', label: 'Spa' },
-  { icon: '🏋️', label: 'Gym' },
-  { icon: '📶', label: 'Wiffi' },
-  { icon: '📺', label: 'Tv' },
-  { icon: '❄️', label: 'Climatización' },
-  { icon: '🚿', label: 'Baño\nPrivado' },
-  { icon: '🍳', label: 'Desayuno\nIncluido' },
-  { icon: '👕', label: 'Lavanderia' },
-  { icon: '🅿️', label: 'Parqueadero' },
-  { icon: '⛰️', label: 'Montaña' },
-  { icon: '🌇', label: 'Balcón' },
-  { icon: '🏊', label: 'Piscina' },
-  { icon: '🌿', label: 'Jardín' },
+  { icon: '🐾', label: 'Pet Friendly', key: 'PET_FRIENDLY' },
+  { icon: '♿', label: 'Accesibilidad', key: 'ACCESIBILIDAD' },
+  { icon: '💆', label: 'Spa', key: 'SPA' },
+  { icon: '🏋️', label: 'Gym', key: 'GYM' },
+  { icon: '📶', label: 'Wiffi', key: 'WIFI' },
+  { icon: '📺', label: 'Tv', key: 'TV' },
+  { icon: '❄️', label: 'Climatización', key: 'CLIMATIZACION' },
+  { icon: '🚿', label: 'Baño Privado', key: 'BANIO_PRIVADO' },
+  { icon: '🍳', label: 'Desayuno Incluido', key: 'DESAYUNO_INCLUIDO' },
+  { icon: '👕', label: 'Lavanderia', key: 'LAVANDERIA' },
+  { icon: '🅿️', label: 'Parqueadero', key: 'PARQUEADERO' },
+  { icon: '⛰️', label: 'Montaña', key: 'MONTANIA' },
+  { icon: '🌇', label: 'Balcón', key: 'BALCON' },
+  { icon: '🏊', label: 'Piscina', key: 'PISCINA' },
+  { icon: '🌿', label: 'Jardín', key: 'JARDIN' },
 ];
 
 // ============ COMPONENTES ============
@@ -35,34 +36,36 @@ export function ButtonContraste({ children, onClick }) {
 
 
 export function SearchBar() {
-  const { bookings = [], getBookings } = useBookings();
-  const [localBookings, setLocalBookings] = useState([]);
+  const { accommodations = [], getAccommodations } = useAccommodations();
+  const [localAccommodations, setLocalAccommodations] = useState([]);
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [showList, setShowList] = useState(false);
 
-  // 1. Cargar las reservas al montar el componente (intentando traer un tamaño amplio si lo soporta tu API)
+  // 1. Cargar los alojamientos al montar el componente (sin enviar objetos extraños)
   useEffect(() => {
     let mounted = true;
     const load = async () => {
-      if (!getBookings) return;
+      if (!getAccommodations) return;
       try {
-        // Si tu API acepta parámetros de paginación, pide un tamaño grande para poder filtrar en cliente:
-        const data = await getBookings({ page: 0, size: 1000 });
+        // Llamamos sin parámetros para que traiga todos los alojamientos activos
+        const data = await getAccommodations();
         if (mounted && data) {
-          setLocalBookings(data);
+          // Extraemos el array ya sea que venga plano o paginado (.content)
+          const items = Array.isArray(data) ? data : (data.content || []);
+          setLocalAccommodations(items);
         }
       } catch (err) {
-        console.error("Error al cargar bookings:", err);
+        console.error("Error al cargar los alojamientos:", err);
       }
     };
     load();
     return () => { mounted = false; };
   }, []);
 
-  // 2. Filtrado local inteligente
+  // 2. Filtrado local inteligente basado en las propiedades reales del Alojamiento
   useEffect(() => {
-    if (query.length < 1) {
+    if (query.trim().length < 1) {
       setSuggestions([]);
       setShowList(false);
       return;
@@ -70,30 +73,25 @@ export function SearchBar() {
 
     const q = query.trim().toLowerCase();
     const id = setTimeout(() => {
-      let rawSource = localBookings.length > 0 ? localBookings : (bookings || []);
-
-      // Extraemos el array del objeto paginado de Spring Boot (.content) o usamos rawSource si ya es un array
-      const source = Array.isArray(rawSource)
-        ? rawSource
-        : (rawSource.content || rawSource.data || []);
+      const source = localAccommodations.length > 0 ? localAccommodations : (accommodations || []);
 
       if (!Array.isArray(source) || source.length === 0) {
         setSuggestions([]);
         return;
       }
 
-      const results = source.filter((b) => {
-        if (!b) return false;
+      const results = source.filter((item) => {
+        if (!item) return false;
 
-        // Adaptado tanto para Objetos JSON como para Arrays/Tuplas por si cambias el backend
-        const accommodationName = String(b.accommodationName || b[4] || '').toLowerCase();
-        const userName = String(b.userName || b[2] || '').toLowerCase();
-        const status = String(b.status || b[8] || '').toLowerCase();
+        // Propiedades reales de tu entidad Accommodation
+        const name = String(item.name || '').toLowerCase();
+        const location = String(item.location || '').toLowerCase();
+        const description = String(item.description || '').toLowerCase();
 
         return (
-          accommodationName.includes(q) ||
-          userName.includes(q) ||
-          status.includes(q)
+          name.includes(q) ||
+          location.includes(q) ||
+          description.includes(q)
         );
       }).slice(0, 6);
 
@@ -102,10 +100,10 @@ export function SearchBar() {
     }, 300);
 
     return () => clearTimeout(id);
-  }, [query, localBookings, bookings]);
+  }, [query, localAccommodations, accommodations]);
 
   const handleSelect = (item) => {
-    setQuery(item.accommodationName || item[4] || '');
+    setQuery(item.name || '');
     setShowList(false);
   };
 
@@ -130,8 +128,10 @@ export function SearchBar() {
       {showList && suggestions.length > 0 && (
         <ul className="search-suggestions" style={{ position: 'absolute', top: '110%', left: 0, right: 0, background: '#fff', zIndex: 1500, listStyle: 'none', margin: 0, padding: '8px 0', boxShadow: '0 6px 18px rgba(0,0,0,0.12)', borderRadius: 6 }}>
           {suggestions.map((s, i) => (
-            <li key={i} onMouseDown={() => handleSelect(s)} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #f0f0f0' }}>
-              <div style={{ fontWeight: '500' }}>{s.accommodationName || s[4]}</div>
+            <li key={s.id || i} onMouseDown={() => handleSelect(s)} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #f0f0f0' }}>
+              {/* Cambiamos accommodationName por s.name y agregamos la ubicación */}
+              <div style={{ fontWeight: '500' }}>{s.name}</div>
+              <div style={{ fontSize: '12px', color: '#666' }}>{s.location}</div>
             </li>
           ))}
         </ul>
@@ -143,7 +143,6 @@ export function SearchBar() {
 export function Header() {
   const { navigateTo } = useNavigation();
   const estaLogueado = localStorage.getItem('token') !== null;
-  console.log(localStorage.getItem('item'))
   const [isSidebarOpen, setSidebarOpen] = useState(false)
   return (
     <>
@@ -190,12 +189,107 @@ export function CategoryIcon({ icon, label }) {
   );
 }
 
-export function CategoriesBar() {
+export function ExplorePage() {
+  const {accommodations = [], getAccommodations} = useAccommodations();
+  const [localAccommodations, setLocalAccommodations] = useState([]); // Corregido: usaba useAccommodations mal
+  const [filteredAccommodations, setFilteredAccommodations] = useState([]); // Corregido el nombre en plural
+  const [selectedFilters, setSelectedFilters] = useState([]);
+
+  useEffect(() => {
+    const localData = async () => {
+      try{
+        const response = await getAccommodations();
+        const data = response?.content || [];
+        setLocalAccommodations(data);
+        setFilteredAccommodations(data);
+      }catch(error){
+        console.error("Error al cargar los alojamientos", error);
+      }
+    };
+    localData();
+  }, []);
+
+  const handleToggleFilter = (key) => {
+    setSelectedFilters((prevFilters) => {
+      if(prevFilters.includes(key)){
+        return prevFilters.filter((f) => f !== key);
+      }else{
+        return [...prevFilters, key];
+      }
+    });
+  };
+
+  useEffect(() => {
+    if(selectedFilters.length === 0) {
+      setFilteredAccommodations([]);
+    } else {
+      const result = localAccommodations.filter((acc) => 
+        selectedFilters.every((filter) => acc.caracteristicas?.includes(filter))
+      );
+      setFilteredAccommodations(result);
+    }
+  }, [selectedFilters, localAccommodations]);
+
+return (
+    <div className="explore-container">
+      {/* Le pasamos la función para cambiar filtros a la barra */}
+      <CategoriesBar 
+        selectedFilters={selectedFilters} 
+        onToggleFilter={handleToggleFilter} 
+      />
+
+      {/* AQUÍ ESTÁ LA CLAVE: Le pasamos el valor (filteredAccommodations) 
+          a otro componente hijo para que lo pinte */}
+      <AccommodationList accommodations={filteredAccommodations} />
+    </div>
+  );
+}
+
+export function AccommodationList({ accommodations }) {
+  return (
+    <div className="accommodations-grid">
+      {accommodations.length > 0 ? (
+        accommodations.map((acc) => (
+          <div key={acc.id} className="card">
+            <h3>{acc.name}</h3>
+            <p>{acc.caracteristicas?.join(', ')}</p>
+          </div>
+        ))
+      ) : (
+        <p>Selecciona una categoría para ver hospedajes.</p>
+      )}
+    </div>
+  );
+}
+
+export function CategoriesBar({ selectedFilters, onToggleFilter }) {
   return (
     <div className="categories-bar">
-      {categories.map((cat) => (
-        <CategoryIcon key={cat.label} icon={cat.icon} label={cat.label} />
-      ))}
+      {categories.map((cat) => {
+        const isSelected = selectedFilters.includes(cat.key);
+
+        return (
+          <div
+            key={cat.key}
+            className="category-item"
+            onClick={() => onToggleFilter(cat.key)}
+            style={{ cursor: 'pointer', background: 'transparent', border: 'none' }}
+          >
+            {/* El círculo amarillo que cambia a negro si está seleccionado */}
+            <div
+              className="category-icon"
+              style={{
+                backgroundColor: isSelected ? '#141414' : '#fdbe02', // Pasa de amarillo a negro
+                color: isSelected ? '#ffffff' : '#141414',           // Cambia el color del icono si es necesario
+                transition: 'background-color 0.2s ease'
+              }}
+            >
+              {cat.icon}
+            </div>
+            <span className="category-label">{cat.label}</span>
+          </div>
+        );
+      })}
     </div>
   );
 }
