@@ -4,6 +4,7 @@ import '../../pages/bookings/Home.css';
 import { useNavigation } from '../../hooks/useNavigation';
 import { useBookings } from '../../hooks/useBookings';
 import { useAccommodations } from '../../hooks/useAccommodations';
+import { getAccommodationsById } from '../../services/accommodationService';
 
 // ============ DATOS ============
 const categories = [
@@ -189,20 +190,20 @@ export function CategoryIcon({ icon, label }) {
   );
 }
 
-export function ExplorePage() {
-  const {accommodations = [], getAccommodations} = useAccommodations();
+export function ExplorePage({ onFilterChange }) {
+  const { accommodations = [], getAccommodations } = useAccommodations();
   const [localAccommodations, setLocalAccommodations] = useState([]); // Corregido: usaba useAccommodations mal
   const [filteredAccommodations, setFilteredAccommodations] = useState([]); // Corregido el nombre en plural
   const [selectedFilters, setSelectedFilters] = useState([]);
 
   useEffect(() => {
     const localData = async () => {
-      try{
+      try {
         const response = await getAccommodations();
         const data = response?.content || [];
         setLocalAccommodations(data);
         setFilteredAccommodations(data);
-      }catch(error){
+      } catch (error) {
         console.error("Error al cargar los alojamientos", error);
       }
     };
@@ -211,61 +212,53 @@ export function ExplorePage() {
 
   const handleToggleFilter = (key) => {
     setSelectedFilters((prevFilters) => {
-      if(prevFilters.includes(key)){
+      if (prevFilters.includes(key)) {
         return prevFilters.filter((f) => f !== key);
-      }else{
+      } else {
         return [...prevFilters, key];
       }
     });
   };
 
-  useEffect(() => {
-    if(selectedFilters.length === 0) {
-      setFilteredAccommodations([]);
-    } else {
-      const result = localAccommodations.filter((acc) => 
+useEffect(() => {
+  const result = selectedFilters.length === 0 
+    ? [] 
+    : localAccommodations.filter((acc) =>
         selectedFilters.every((filter) => acc.caracteristicas?.includes(filter))
       );
-      setFilteredAccommodations(result);
-    }
-  }, [selectedFilters, localAccommodations]);
 
-return (
+  setFilteredAccommodations(result);
+
+  // Verificamos que sea una función antes de invocarla pasándole el objeto
+  if (typeof onFilterChange === 'function') {
+    onFilterChange({
+      results: result,
+      hasActiveFilters: selectedFilters.length > 0
+    });
+  }
+}, [selectedFilters, localAccommodations, onFilterChange]);
+
+  return (
     <div className="explore-container">
       {/* Le pasamos la función para cambiar filtros a la barra */}
-      <CategoriesBar 
-        selectedFilters={selectedFilters} 
-        onToggleFilter={handleToggleFilter} 
+      <CategoriesBar
+        selectedFilters={selectedFilters}
+        onToggleFilter={handleToggleFilter}
+        categorias={categories}
       />
 
       {/* AQUÍ ESTÁ LA CLAVE: Le pasamos el valor (filteredAccommodations) 
           a otro componente hijo para que lo pinte */}
-      <AccommodationList accommodations={filteredAccommodations} />
+      <TarjetaAlojamiento accommodations={filteredAccommodations} categoriasFiltradas={selectedFilters}/>
     </div>
   );
 }
 
-export function AccommodationList({ accommodations }) {
-  return (
-    <div className="accommodations-grid">
-      {accommodations.length > 0 ? (
-        accommodations.map((acc) => (
-          <div key={acc.id} className="card">
-            <h3>{acc.name}</h3>
-            <p>{acc.caracteristicas?.join(', ')}</p>
-          </div>
-        ))
-      ) : (
-        <p>Selecciona una categoría para ver hospedajes.</p>
-      )}
-    </div>
-  );
-}
 
-export function CategoriesBar({ selectedFilters, onToggleFilter }) {
+export function CategoriesBar({ selectedFilters, onToggleFilter, categorias }) {
   return (
     <div className="categories-bar">
-      {categories.map((cat) => {
+      {categorias.map((cat) => {
         const isSelected = selectedFilters.includes(cat.key);
 
         return (
@@ -474,5 +467,61 @@ export function NumberSelector() {
         </button>
       </div>
     </div>
+  );
+}
+
+export function TarjetaAlojamiento({
+  accommodations
+,categoriasFiltradas }){
+  const { navigateTo } = useNavigation();
+
+  if(accommodations.length === 0 && categoriasFiltradas.length > 0){
+    return(
+      <p>
+        No se encontraron hospedajes que coincidan con tu búsqueda.
+      </p>
+    )
+  }
+  return (
+    <>
+      {accommodations.length > 0 &&
+        accommodations.map((acc, index) => (
+          <article className="tarjeta-alojamiento" key={acc?.id || index}>
+            <img
+              className="tarjeta-alojamiento__imagen"
+              src={acc?.rutaImagenes?.[0] || acc?.rutaImagen}
+              alt={`Vista de ${acc?.name}`}
+            />
+
+            <div className="tarjeta-alojamiento__contenido">
+              <header className="tarjeta-alojamiento__header">
+                <h2>{acc?.name}</h2>
+              </header>
+
+              <p className="tarjeta-alojamiento__descripcion">
+                {acc?.description}
+              </p>
+
+              <CategoriesBar
+                selectedFilters={acc?.caracteristicas}
+                onToggleFilter={() => { }}
+                categorias={categories.filter((cat) =>
+                  acc?.caracteristicas?.includes(cat.key)
+                )}
+              />
+
+              <div className="tarjeta-alojamiento__acciones">
+                <button type="button" onClick={() => navigateTo('/login')}>
+                  Editar
+                </button>
+
+                <button type="button" onClick={() => navigateTo('/login')}>
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </article>
+        ))}
+    </>
   );
 }

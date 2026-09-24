@@ -4,6 +4,12 @@ import { Header, Menu, ExplorePage, DateSelector, HeroImage, FilterSection, CTAS
 import imagenDefault from '../../assets/url_por_defecto.png'
 
 export default function BookingPage() {
+
+  const [hasSearch, setHasSearched] = useState(false);
+
+  const handleFilterChange = ({ hasActiveFilters } = {}) => {
+    setHasSearched(hasActiveFilters);
+  };
   // 1. Usamos tu hook corregido de alojamientos
   const { accommodations = [], loading, error, getAccommodations, newAccommodation } = useAccommodations();
 
@@ -20,7 +26,7 @@ export default function BookingPage() {
   useEffect(() => {
     let mounted = true;
     const load = async () => {
-      if (!getAccommodations)return;
+      if (!getAccommodations) return;
       try {
         // Llamamos a la función del hook sin parámetros para traer todos inicialmente
         const data = await getAccommodations();
@@ -97,20 +103,24 @@ export default function BookingPage() {
     <div className="home">
       <Header />
       <Menu />
-      <ExplorePage />
-      <div className="date-selectors">
-        <DateSelector />
-        <NumberSelector />
-      </div>
-      <HeroImage />
-      {sections.map((section) => (
-        <FilterSection
-          key={section.title}
-          title={section.title}
-          images={section.images}
-        />
-      ))}
-      <CTASection />
+      <ExplorePage onFilterChange={handleFilterChange} />
+      {!hasSearch && (
+        <>
+          <div className="date-selectors">
+            <DateSelector />
+            <NumberSelector />
+          </div>
+          <HeroImage />
+          {sections.map((section) => (
+            <FilterSection
+              key={section.title}
+              title={section.title}
+              images={section.images}
+            />
+          ))}
+          <CTASection />
+        </>
+      )}
     </div>
   )
 }
