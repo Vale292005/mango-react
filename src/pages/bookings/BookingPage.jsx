@@ -111,8 +111,8 @@ export default function BookingPage() {
       {!hasSearch && (
         <>
           <div className="date-selectors">
-            <DateSelector />
-            <NumberSelector />
+            {//<DateSelector /> 
+}
           </div>
           <HeroImage />
           {sections.map((section) => (

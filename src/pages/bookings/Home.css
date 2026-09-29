@@ -129,7 +129,7 @@
   gap: 40px;
   padding: 10px;
   overflow-x: auto;
-  height: 72px;
+  height: auto;
 }
 
 .category-item {
@@ -244,7 +244,7 @@
   padding: 10px 16px;
   background: #dfdfdf;
   overflow-x: auto;
-  
+
 }
 
 .carousel-card {
@@ -413,14 +413,14 @@
   }
 }
 
-.explore-container{
+.explore-container {
   display: flex;
   flex-direction: column;
   justify-content: top;
   align-items: center;
 }
 
-.contenedor{
+.contenedor {
   display: flex;
   flex-direction: column;
   padding: 10px;
@@ -429,4 +429,48 @@
   background-color: #fdbe02;
   border-radius: 10px;
   gap: 10px;
+}
+
+/* En tu archivo PriceSelector.css o ListaHospedajes.css */
+.price-slider {
+  width: 100%;
+  cursor: pointer;
+  accent-color: #2a9d8f;
+  /* 🎨 Cambia este valor por el color de tu diseño */
+}
+
+.location-selector {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  max-width: 280px;
+  /* Ajusta según el ancho que desees */
+}
+
+.location-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* 2. ELIMINA EL BORDE Y CUALQUIER LÍNEA AL HACER CLIC */
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+
+  background-color: #ffbe05;
+  /* Color amarillo de la imagen */
+  font-family: inherit;
+  font-size: 16px;
+
+  padding: 8px 48px 8px 20px;
+  border-radius: 12px;
+
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease-in-out;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 18px;
 }

@@ -170,11 +170,11 @@ export function Header() {
 
 export function Menu() {
   const { navigateTo } = useNavigation();
-  const items = [{ name: 'Menú', path: '/' }, { name: 'Alojamientos', path: '/' }, { name: 'Panel Personal', parh: '/' }];
+  const items = [{ name: 'Menú', path: '/' }, { name: 'Alojamientos', path: '/alojamientos' }, { name: 'Panel Personal', parh: '/' }];
   return (
     <nav className="menu">
       {items.map((item) => (
-        <a key={item.name} href="#" className="menu-item" onClick={() => navigateTo(item.parh)}>
+        <a key={item.name} href="#" className="menu-item" onClick={() => navigateTo(item.path)}>
           {item.name}
         </a>
       ))}
@@ -545,4 +545,74 @@ export function TarjetaAlojamiento({
     </>
 
   );
+}
+
+export function PriceSelector({value, onChange, minPrice=0, maxPrice=9999}){
+  const [precio, setPrecio] = useState(value!==undefined? value :minPrice);
+
+  useEffect(() => {
+    if(value!== undefined){
+      setPrecio(value);
+    }
+  },[value]);
+
+  const handleChange = (e) => {
+    const nuevoPrecio = Number(e.target.value);
+    setPrecio(nuevoPrecio);
+    if(onChange){
+      onChange(nuevoPrecio);
+    }
+  };
+  return (
+    <div className="date-selector price-selector">
+      <span className="date-label">Precio Máximo</span>
+
+      <div className="price-controls">
+        <input
+          type="range"
+          min={minPrice}
+          max={maxPrice}
+          step={10} // Incrementos de 10 en 10
+          value={precio}
+          onChange={handleChange}
+          className="price-slider"
+        />
+        <span className="price-display">${precio}</span>
+      </div>
+    </div>
+  );
+}
+
+export function LocationSelector({value, onChange, locations=[]}){
+
+  const[selectedLocation, setSelectedLocation]=useState(value || "");
+
+  useEffect(() => {
+    setSelectedLocation(value || '');
+  }, [value]);
+
+  const handleChange = (e) => {
+    const nuevaUbicacion = e.target.value;
+    setSelectedLocation(nuevaUbicacion);
+    if(onChange){
+      onChange(nuevaUbicacion);
+    }
+  }
+  return (
+    <div className="date-selector location-selector">
+      <select 
+        value={selectedLocation} 
+        onChange={handleChange}
+        className="location-select"
+      >
+        <option value="">Todas las ubicaciones</option>
+        {locations.map((loc) => (
+          <option key={loc} value={loc}>
+            {loc}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+
 }
