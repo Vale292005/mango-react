@@ -1,6 +1,7 @@
 import BookingPage from './pages/bookings/BookingPage'
 import LoginPage from './pages/auth/LoginPage'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import ListaHospedajes from './pages/list/ListaHospedajes'
 
 function HomePage() {
   return <BookingPage />
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<LoginPage />} />
         <Route path="/booking" element={<BookingPage />} />
+        <Route path="/alojamientos" element={<ListaHospedajes/>}/>
       </Routes>
     </BrowserRouter>
   )

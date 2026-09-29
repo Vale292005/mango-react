@@ -169,12 +169,13 @@ export function Header() {
 }
 
 export function Menu() {
-  const items = ['Menú', 'Alojamientos', 'Panel Personal'];
+  const { navigateTo } = useNavigation();
+  const items = [{ name: 'Menú', path: '/' }, { name: 'Alojamientos', path: '/' }, { name: 'Panel Personal', parh: '/' }];
   return (
     <nav className="menu">
       {items.map((item) => (
-        <a key={item} href="#" className="menu-item">
-          {item}
+        <a key={item.name} href="#" className="menu-item" onClick={() => navigateTo(item.parh)}>
+          {item.name}
         </a>
       ))}
     </nav>
@@ -220,23 +221,23 @@ export function ExplorePage({ onFilterChange }) {
     });
   };
 
-useEffect(() => {
-  const result = selectedFilters.length === 0 
-    ? [] 
-    : localAccommodations.filter((acc) =>
+  useEffect(() => {
+    const result = selectedFilters.length === 0
+      ? []
+      : localAccommodations.filter((acc) =>
         selectedFilters.every((filter) => acc.caracteristicas?.includes(filter))
       );
 
-  setFilteredAccommodations(result);
+    setFilteredAccommodations(result);
 
-  // Verificamos que sea una función antes de invocarla pasándole el objeto
-  if (typeof onFilterChange === 'function') {
-    onFilterChange({
-      results: result,
-      hasActiveFilters: selectedFilters.length > 0
-    });
-  }
-}, [selectedFilters, localAccommodations, onFilterChange]);
+    // Verificamos que sea una función antes de invocarla pasándole el objeto
+    if (typeof onFilterChange === 'function') {
+      onFilterChange({
+        results: result,
+        hasActiveFilters: selectedFilters.length > 0
+      });
+    }
+  }, [selectedFilters, localAccommodations, onFilterChange]);
 
   return (
     <div className="explore-container">
@@ -249,7 +250,7 @@ useEffect(() => {
 
       {/* AQUÍ ESTÁ LA CLAVE: Le pasamos el valor (filteredAccommodations) 
           a otro componente hijo para que lo pinte */}
-      <TarjetaAlojamiento accommodations={filteredAccommodations} categoriasFiltradas={selectedFilters}/>
+      <TarjetaAlojamiento accommodations={filteredAccommodations} categoriasFiltradas={selectedFilters} />
     </div>
   );
 }
@@ -390,9 +391,17 @@ export function HeroImage() {
 export function ImageCarousel({ images }) {
   return (
     <div className="carousel">
-      {images.map((img, i) => (
+      {images.map((item, i) => (
         <div key={i} className="carousel-card">
-          <img src={img} alt={`Alojamiento ${i + 1}`} />
+          <img
+            src={item.url || item.src || imagenDefault}
+            alt={item.name || "Alojamiento"}
+            crossOrigin="anonymous"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = imagenDefault; // Si alguna URL vuelve a ser bloqueada por CORB, fuerza el respaldo local
+            }}
+          />
         </div>
       ))}
     </div>
@@ -426,22 +435,32 @@ export function CTASection() {
 }
 
 
-export function NumberSelector() {
-  const [guest, setGuest] = useState(2);
+export function NumberSelector({ value, onChange }) {
+  const [guest, setGuest] = useState(value !== undefined ? value : 2);
   const min = 1;
   const max = 10;
 
+  useEffect(() => {
+    if (value !== undefined) {
+      setGuest(value);
+    }
+  }, [value]);
+
   const aumentar = () => {
     if (guest < max) {
-      setGuest((prev) => prev + 1);
+      const nuevoValor = guest + 1;
+      setGuest(nuevoValor); // Actualiza la vista inmediatamente
+      if (onChange) onChange(nuevoValor); // Notifica al padre
     }
-  }
+  };
 
   const disminuir = () => {
     if (guest > min) {
-      setGuest((prev) => prev - 1);
+      const nuevoValor = guest - 1;
+      setGuest(nuevoValor); // Actualiza la vista inmediatamente
+      if (onChange) onChange(nuevoValor); // Notifica al padre
     }
-  }
+  };
 
   return (
     <div className="date-selector">
@@ -472,11 +491,11 @@ export function NumberSelector() {
 
 export function TarjetaAlojamiento({
   accommodations
-,categoriasFiltradas }){
+  , categoriasFiltradas }) {
   const { navigateTo } = useNavigation();
 
-  if(accommodations.length === 0 && categoriasFiltradas.length > 0){
-    return(
+  if (accommodations.length === 0 && categoriasFiltradas.length > 0) {
+    return (
       <p>
         No se encontraron hospedajes que coincidan con tu búsqueda.
       </p>
@@ -484,44 +503,46 @@ export function TarjetaAlojamiento({
   }
   return (
     <>
-      {accommodations.length > 0 &&
-        accommodations.map((acc, index) => (
-          <article className="tarjeta-alojamiento" key={acc?.id || index}>
-            <img
-              className="tarjeta-alojamiento__imagen"
-              src={acc?.rutaImagenes?.[0] || acc?.rutaImagen}
-              alt={`Vista de ${acc?.name}`}
-            />
+      {accommodations.length > 0 && (
+        <div className='contenedor'>
+          <p>Resultados:</p>
+          {accommodations.length > 0 &&
+            accommodations.map((acc, index) => (
+              <article className="tarjeta-alojamiento" key={acc?.id || index} onClick={() => navigateTo('login')}>
+                <img
+                  className="tarjeta-alojamiento__imagen"
+                  src={acc?.rutaImagenes?.[0] || acc?.rutaImagen}
+                  alt={`Vista de ${acc?.name}`}
+                />
 
-            <div className="tarjeta-alojamiento__contenido">
-              <header className="tarjeta-alojamiento__header">
-                <h2>{acc?.name}</h2>
-              </header>
+                <div className="tarjeta-alojamiento__contenido">
+                  <header className="tarjeta-alojamiento__header">
+                    <h2>{acc?.name}</h2>
+                  </header>
 
-              <p className="tarjeta-alojamiento__descripcion">
-                {acc?.description}
-              </p>
+                  <p className="tarjeta-alojamiento__descripcion">
+                    {acc?.description}
+                  </p>
 
-              <CategoriesBar
-                selectedFilters={acc?.caracteristicas}
-                onToggleFilter={() => { }}
-                categorias={categories.filter((cat) =>
-                  acc?.caracteristicas?.includes(cat.key)
-                )}
-              />
+                  <CategoriesBar
+                    selectedFilters={acc?.caracteristicas}
+                    onToggleFilter={() => { }}
+                    categorias={categories.filter((cat) =>
+                      acc?.caracteristicas?.includes(cat.key)
+                    )}
+                  />
 
-              <div className="tarjeta-alojamiento__acciones">
-                <button type="button" onClick={() => navigateTo('/login')}>
-                  Editar
-                </button>
-
-                <button type="button" onClick={() => navigateTo('/login')}>
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          </article>
-        ))}
+                  <div className="tarjeta-alojamiento__acciones">
+                    <button type="button" onClick={() => navigateTo('/login')}>
+                      Reservar
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+        </div>
+      )}
     </>
+
   );
 }

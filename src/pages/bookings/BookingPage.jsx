@@ -59,7 +59,9 @@ export default function BookingPage() {
     {
       title: "Alojamientos con Piscina",
       images: alojamientosConPiscina.map(item => ({
-        url: item.rutasImagenes?.[0] || imagenDefault,
+        url: (item.rutasImagenes?.[0] && item.rutasImagenes[0].trim() !== '')
+        ? item.rutasImagenes[0]: imagenDefault,
+        src: item.rutasImagenes?.[0] || imagenDefault,
         title: item.name,
         location: item.location,
         id: item.id
@@ -69,6 +71,7 @@ export default function BookingPage() {
       title: "Pet Friendly",
       images: alojamientosPetFriendly.map(item => ({
         url: item.rutasImagenes?.[0] || imagenDefault,
+        src: item.rutasImagenes?.[0] || imagenDefault,
         title: item.name,
         location: item.location,
         id: item.id
@@ -78,6 +81,7 @@ export default function BookingPage() {
       title: "Con Parqueadero",
       images: alojamientosConParking.map(item => ({
         url: item.rutasImagenes?.[0] || imagenDefault,
+        src: item.rutasImagenes?.[0] || imagenDefault,
         title: item.name,
         location: item.location,
         id: item.id

@@ -333,6 +333,7 @@
   font-family: Arial, sans-serif;
   color: #141414;
   box-shadow: 0 8px 24px rgba(20, 20, 20, 0.08);
+  gap: auto;
 }
 
 .tarjeta-alojamiento__imagen {
@@ -346,6 +347,8 @@
   display: flex;
   flex-direction: column;
   padding: 30px 20px 18px;
+  justify-content: center;
+  align-items: center;
 }
 
 .tarjeta-alojamiento__header {
@@ -383,9 +386,6 @@
 .tarjeta-alojamiento__acciones {
   display: flex;
   justify-content: center;
-  gap: 40px;
-  margin-top: auto;
-  padding-top: 10px;
 }
 
 .tarjeta-alojamiento__acciones button {
@@ -418,4 +418,15 @@
   flex-direction: column;
   justify-content: top;
   align-items: center;
+}
+
+.contenedor{
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  height: auto;
+  width: fit-content;
+  background-color: #fdbe02;
+  border-radius: 10px;
+  gap: 10px;
 }
